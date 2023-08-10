@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 DISTNAME = 'PMAZ'
 DESCRIPTION = 'Project_MyAlphaZero'
 MAINTAINER = 'Marco A. Egea Moreno'
-URL = 'https://github.com/Markoegea/Project_MyAlphaZero'
+URL = 'https://github.com/Markoegea/my_alphazero'
 
 classifiers = ['Programming Language :: Python',
                'Programming Language :: Python :: 2',
