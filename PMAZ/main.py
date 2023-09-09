@@ -28,7 +28,8 @@ game = ConnectFour()
 player = 1
 state = game.get_initial_state()
 
-def play_alone():
+def play_alone(game, player):
+    state = game.get_initial_state()
     while True:
        print(state)
        if player == 1:
@@ -42,8 +43,7 @@ def play_alone():
 
        else:
            neutral_state = game.change_perspective(state, player)
-
-           valid_moves = game.get_valid_moves(state)
+           valid_moves = game.get_valid_moves(neutral_state)
            print("valid_moves", [i for i in range(game.action_size) if valid_moves[i] == 1])
            action = int(input(f'{player}:'))
            if valid_moves[action] == 0:
@@ -145,6 +145,7 @@ def plot_model_predictions(state,device):
         plt.show()
 
 if __name__ == '__main__':
+    play_alone(game, player)
     #plot_model_predictions(state,device)
-    train_model(game, args)
+    #train_model(game, args)
     #play_with_machine(game,player,args,device)
