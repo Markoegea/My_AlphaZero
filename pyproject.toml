@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pmaz"
+version = "0.1"
+description = "A implementation of the AlphaZero of the games Tic Tac Toe and Connect Four"
+readme = "README.md"
+requires-python = ">=3.8"
+authors =  [
+    {name = "Marco Egea", email = "thekingmarco03@gmail.com"},
+]
+# MIT
+license = {file = "LICENSE"}
+
+dependencies = [
+    "boto3",
+    "encodec",
+    "funcy",
+    "huggingface-hub>=0.14.1",
+    "numpy",
+    "scipy",
+    "tokenizers",
+    "torch",
+    "tqdm",
+    "transformers",
+]
+
+[project.urls]
+source = "https://github.com/Markoegea/My_AlphaZero"
+
+[project.optional-dependencies]
+dev = [
+    "numpy",
+    "torch",
+    "tqdm",
+    "matplotlib",
+]
+
+[tool.setuptools]
+packages = ["pmaz"]
