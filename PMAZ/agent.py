@@ -184,15 +184,30 @@ class AlphaZero:
             for epoch in tqdm(range(self.args['num_epochs'])):
                 self.train(memory, train_losses)
 
-            self.save_model(iteration)
+            self.save_model(iteration, memory)
         return train_losses
 
-    def save_model(self,iteration):
+    def save_model(self, iteration, onnx_export=False, dummy_sate=None, pth_file=None, dynamic_model=False):
         info = str(self.args['num_resBlocks']) + '_' + str(self.args['num_hidden'])+ '_' + str(self.game)
         pathModel = Path(f'models/model_{info}')
         pathModel.mkdir(parents=True, exist_ok=True)
-        torch.save(self.model.state_dict(), pathModel/f'model_{iteration}_{self.game}.pth')
 
+        if onnx_export and dummy_sate is not None:
+            print('Exporting model to onnx...')
+            model = self.model
+            if pth_file != None:
+                print('Load state dict...')
+                model.load_state_dict(torch.load(pth_file, map_location=device))
+            if dynamic_model:
+                model = torch.jit.script(model)
+            dummy_sate = torch.tensor(self.game.get_encoded_state(dummy_sate), dtype=torch.float32).unsqueeze(0).to(device)
+            input_names = ["input_state", "game", "num_resBlocks", "num_hidden"]
+            output_names = ["out_policy", "out_value"]
+            torch.onnx.export(model, dummy_sate, pathModel/f'model_{iteration}_{self.game}.onnx', verbose=True, input_names=input_names,
+                              output_names=output_names, dynamic_axes={'input':{0:'batch_size'}, 'output':{0:'batch_size'}})
+            print('Model Expoted Successful')
+            return
+        torch.save(self.model.state_dict(), pathModel/f'model_{iteration}_{self.game}.pth')
         pathOptimizer = Path(f'optimizers/model_{info}')
         pathOptimizer.mkdir(parents=True, exist_ok=True)
         torch.save(self.model.state_dict(), pathOptimizer/f'optimizer_{iteration}_{self.game}.pth')

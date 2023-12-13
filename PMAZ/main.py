@@ -1,4 +1,5 @@
 #External libraries
+import onnx
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -31,7 +32,8 @@ state = game.get_initial_state()
 def play_alone(game, player):
     state = game.get_initial_state()
     while True:
-       print(state)
+       #print(state)
+       print(game.get_encoded_state(state))
        if player == 1:
            valid_moves = game.get_valid_moves(state)
            print("valid_moves", [i for i in range(game.action_size) if valid_moves[i] == 1])
@@ -65,11 +67,12 @@ def play_alone(game, player):
 
 def play_with_machine(game, player, args,device):
     model = ResNet(game, args['num_resBlocks'], args['num_hidden']).to(device)
-    model.load_state_dict(torch.load('models/model_4_64_ConnectFour/model_7_ConnectFour.pth', map_location=device))
+    
+    state = game.get_initial_state()
+
+    model.load_state_dict(torch.load('models/model_4_64_ConnectFour/model_1_ConnectFour.pth', map_location=device))
 
     mcts = MCTS(game, args, model)
-
-    state = game.get_initial_state()
 
     model.eval()
     with torch.inference_mode():
@@ -143,9 +146,24 @@ def plot_model_predictions(state,device):
         print(policy, value)
         plt.bar(range(game.action_size), policy)
         plt.show()
+        
+def export_to_onnx(game, args):
+    model = ResNet
+    pth_file = 'models/model_4_64_ConnectFour/model_1_ConnectFour.pth'
+    optimizer = torch.optim.Adam
+    alphaZero = AlphaZero(model, optimizer, game, args)
+    state = game.get_initial_state()
+    alphaZero.save_model(1, onnx_export=True, dummy_sate=state, pth_file=pth_file, dynamic_model=True)
+    
+def check_onnx(path_file):
+    model = onnx.load(path_file)
+    onnx.checker.check_model(model)
+    print(onnx.helper.printable_graph(model.graph))
 
 if __name__ == '__main__':
     play_alone(game, player)
     #plot_model_predictions(state,device)
     #train_model(game, args)
     #play_with_machine(game,player,args,device)
+    #export_to_onnx(game,args)
+    #check_onnx("models/model_4_64_ConnectFour/model_1_ConnectFour.onnx")
