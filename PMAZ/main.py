@@ -136,7 +136,7 @@ def plot_model_predictions(state,device):
     print(tensor_state.shape)
 
     model = ResNet(game, args['num_resBlocks'], args['num_hidden']).to(device)
-    model.load_state_dict(torch.load('models/model_4_64_ConnectFour/model_7_ConnectFour.pth',map_location=device))
+    model.load_state_dict(torch.load('models/model_4_64_ConnectFour/model_0_ConnectFour.pth',map_location=device))
 
     model.eval()
     with torch.inference_mode():
@@ -161,9 +161,27 @@ def check_onnx(path_file):
     print(onnx.helper.printable_graph(model.graph))
 
 if __name__ == '__main__':
-    play_alone(game, player)
-    #plot_model_predictions(state,device)
-    #train_model(game, args)
-    #play_with_machine(game,player,args,device)
+    menu = """
+    Menu:
+    1. Play Chess game in cooperative mode.
+    2. Play Chess game against the machine.
+    3. Train the model by playing with itself.
+    4. Plot the model predictions given a state.
+    5. Exit.
+    Enter your choice (1-5):
+    """
+    choice = input(menu)
+    if choice == '1':
+        play_alone(player, game)
+    elif choice == '2':
+        play_with_machine(game, player, args, device) 
+    elif choice == '3':
+        train_model(game, args)
+    elif choice == '4':
+        state = game.get_initial_state()
+        plot_model_predictions(state, device)
+    elif choice == '5':
+            print("Exiting the program. Goodbye!")
+         
     #export_to_onnx(game,args)
     #check_onnx("models/model_4_64_ConnectFour/model_1_ConnectFour.onnx")
